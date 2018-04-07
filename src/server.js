@@ -1,8 +1,11 @@
-var env = require('dotenv').load();
+var dotenv = require('dotenv');
+dotenv.load();
+
 var express = require('express');
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
 var mongoose = require('mongoose');
+var Admin = require('./models/admin');
 
 var app = express();
 app.use(bodyParser.json());
@@ -10,11 +13,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
 var options = {
-  user: env.parsed.DB_USER,
-  pass: env.parsed.DB_PASSWORD,
+  user: process.env.DB_USER,
+  pass: process.env.DB_PASSWORD,
 };
 
-mongoose.connect(`mongodb://192.168.1.37:27017/proyecto`, options, function(error) {
+mongoose.connect(`mongodb://${process.env.DB_IP}:${process.env.DB_PORT}/proyecto`, options, function(error) {
   if (error) {
     console.log('Error de conexión a MongoDB', error);
   } else {
@@ -23,11 +26,38 @@ mongoose.connect(`mongodb://192.168.1.37:27017/proyecto`, options, function(erro
 });
 
 app.post('/login', function(req, res) {
-  res.send('Intento de login' + req.body.usuario);
+  Admin.findOne({ name: req.body.usuario }, function(error, admin) {
+    if (error) {
+      res.status(500).json({ success: false, message: 'Error' });
+    } else {
+      if (!admin) {
+        res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+      } else {
+        admin.checkPassword(req.body.password, function(error) {
+          if (error) {
+            res.status(401).json({ success: false, message: 'Contraseña incorrecta' });
+          } else {
+            res.json({ success: true, message: 'Acceso correcto' });
+          }
+        });
+      }
+    }
+  });
 });
 
 app.get('/setup', function(req, res) {
-  res.send('Creando administrador');
+  console.log('Creando administrador');
+  var admin = new Admin({
+    name: 'Admin',
+    password: '1234',
+  });
+  admin.save(function(error) {
+    if (error) {
+      res.status(500).json({ success: false, message: 'Error al crear administrador' });
+    } else {
+      res.json({ success: true, message: 'Administrador creado' });
+    }
+  });
 });
 
 var secureRouter = express.Router();
