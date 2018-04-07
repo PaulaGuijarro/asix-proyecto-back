@@ -5,6 +5,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
 var mongoose = require('mongoose');
+var jwt = require('jsonwebtoken');
 var Admin = require('./models/admin');
 var User = require('./models/user');
 
@@ -38,7 +39,11 @@ app.post('/login', function(req, res) {
           if (error) {
             res.status(401).json({ success: false, message: 'Contraseña incorrecta' });
           } else {
-            res.json({ success: true, message: 'Acceso correcto' });
+            const payload = {
+              admin: admin.name,
+            };
+            var token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '2h' });
+            res.json({ success: true, message: 'Acceso correcto', token });
           }
         });
       }
@@ -71,8 +76,13 @@ secureRouter.use(function(req, res, next) {
       message: 'No hay token.',
     });
   } else {
-    console.log('token check passed');
-    next();
+    jwt.verify(token, process.env.JWT_SECRET, function(error) {
+      if (error) {
+        res.status(401).json({ success: false, message: 'Token incorrecto' });
+      } else {
+        next();
+      }
+    });
   }
 });
 
