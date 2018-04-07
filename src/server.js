@@ -6,6 +6,7 @@ var bodyParser = require('body-parser');
 var morgan = require('morgan');
 var mongoose = require('mongoose');
 var Admin = require('./models/admin');
+var User = require('./models/user');
 
 var app = express();
 app.use(bodyParser.json());
@@ -76,19 +77,75 @@ secureRouter.use(function(req, res, next) {
 });
 
 secureRouter.route('/users').get(function(req, res) {
-  res.send('Lista de usuarios');
+  User.find({}, function(error, users) {
+    if (error) {
+      res.status(500).json({ success: false, message: 'Error' });
+    } else {
+      res.json({ success: true, users });
+    }
+  });
 });
 
 secureRouter.route('/users').post(function(req, res) {
-  res.send('Creando usuario');
+  var user = new User({
+    name: req.body.name,
+    lastname: req.body.lastname,
+    dni: req.body.dni,
+    email: req.body.email,
+    department: req.body.department,
+  });
+  user.save(function(error) {
+    if (error) {
+      res.status(500).json({ success: false, message: 'Error al crear usuario' });
+    } else {
+      res.json({ success: true, message: 'Usuario creado' });
+    }
+  });
 });
 
 secureRouter.route('/users/:id').delete(function(req, res) {
-  res.send('Borrando usuario');
+  User.remove({ _id: req.params.id }, function(error) {
+    if (error) {
+      res.status(500).json({ success: false, message: 'Error al borrar usuario' });
+    } else {
+      res.json({ success: true, message: 'Usuario borrado' });
+    }
+  });
 });
 
 secureRouter.route('/users/:id').put(function(req, res) {
-  res.send('Actualizando usuario');
+  User.findById(req.params.id, function(error, user) {
+    if (error) {
+      res.status(500).json({ success: false, message: 'Error al actualizar usuario' });
+    } else {
+      if (!user) {
+        res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+      } else {
+        if (req.body.name) {
+          user.name = req.body.name;
+        }
+        if (req.body.lastname) {
+          user.lastname = req.body.lastname;
+        }
+        if (req.body.dni) {
+          user.dni = req.body.dni;
+        }
+        if (req.body.email) {
+          user.email = req.body.email;
+        }
+        if (req.body.department) {
+          user.department = req.body.department;
+        }
+        user.save(function(error) {
+          if (error) {
+            res.status(500).json({ success: false, message: 'Error al actualizar usuario' });
+          } else {
+            res.json({ success: true, message: 'Usuario actualizado' });
+          }
+        });
+      }
+    }
+  });
 });
 
 app.use('/secure', secureRouter);
