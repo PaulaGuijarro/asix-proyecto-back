@@ -4,7 +4,8 @@
   "description": "Servidor Node.JS para una aplicación de gestión de usuarios que forma parte del proyecto final de ASIX",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon src/server.js"
   },
   "repository": {
     "type": "git",
@@ -39,5 +40,10 @@
         "git add"
       ]
     }
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.3",
+    "jsonwebtoken": "^8.2.1"
   }
 }

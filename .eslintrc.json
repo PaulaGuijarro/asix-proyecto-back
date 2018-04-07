@@ -12,7 +12,7 @@
   },
   "globals": {
     "module": true,
-    "cy": true,
+    "require": true,
     "process": true
   }
 }
