@@ -1,6 +1,7 @@
 var dotenv = require('dotenv');
 dotenv.load();
 
+var cors = require('cors');
 var express = require('express');
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
@@ -13,19 +14,25 @@ var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('dev'));
+app.use(cors());
 
 var options = {
   user: process.env.DB_USER,
   pass: process.env.DB_PASSWORD,
 };
 
-mongoose.connect(`mongodb://${process.env.DB_IP}:${process.env.DB_PORT}/proyecto`, options, function(error) {
-  if (error) {
-    console.log('Error de conexión a MongoDB', error);
-  } else {
-    console.log('Conectado a MongoDB');
+mongoose.connect(
+  `mongodb://mongo-repl-1:27017,mongo-repl-2:27017,mongo-repl-3:27017/proyecto?replicaSet=rs0&readPreference=primary`,
+  options,
+  function(error) {
+    // mongoose.connect(`mongodb://${process.env.DB_IP}:${process.env.DB_PORT}/proyecto`, options, function(error) {
+    if (error) {
+      console.log('Error de conexión a MongoDB', error);
+    } else {
+      console.log('Conectado a MongoDB');
+    }
   }
-});
+);
 
 app.post('/login', function(req, res) {
   Admin.findOne({ name: req.body.usuario }, function(error, admin) {
@@ -64,6 +71,27 @@ app.get('/setup', function(req, res) {
       res.json({ success: true, message: 'Administrador creado' });
     }
   });
+});
+
+app.get('/check', function(req, res) {
+  var token = req.query.token;
+  if (!token) {
+    res.status(401).send({
+      success: false,
+      message: 'No hay token',
+    });
+  } else {
+    jwt.verify(token, process.env.JWT_SECRET, function(error) {
+      if (error) {
+        res.status(401).json({ success: false, message: 'Token incorrecto' });
+      } else {
+        res.send({
+          success: true,
+          message: 'Token correcto',
+        });
+      }
+    });
+  }
 });
 
 var secureRouter = express.Router();
