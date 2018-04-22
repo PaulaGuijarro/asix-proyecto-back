@@ -76,7 +76,7 @@ mongoose.connect(
 app.post('/login', function(req, res) {
   /**
    * Buscamos utilizando el modelo de mongoose referido a la tabla 'admins' de MongoDB un administrador
-   * que tenga el mismo nombre que el que viene en el cuerpo de la petición. 
+   * que tenga el mismo nombre que el que viene en el cuerpo de la petición.
    * Para ello usamos la función findOne, que tiene su función análoga en MongoDB y que devuelve EXACTAMENTE un resultado, y en caso
    * de que varias filas coincidan con la búsqueda, que se pone en el primer parámetro de la función, devolverá el primero de ellos.
    * El cuerpo de la petición viene en req.body. De manera que si una petición es del estilo:
@@ -88,7 +88,7 @@ app.post('/login', function(req, res) {
    */
   Admin.findOne({ name: req.body.usuario }, function(error, admin) {
     if (error) {
-      // En caso de que se haya producido algún error, la petición termina con un código HTTP 500 (SERVER ERROR) y enviando como respuesta 
+      // En caso de que se haya producido algún error, la petición termina con un código HTTP 500 (SERVER ERROR) y enviando como respuesta
       // un objeto indicando que la petición ha sido errónea
       res.status(500).json({ success: false, message: 'Error' });
     } else {
@@ -152,7 +152,7 @@ app.get('/setup', function(req, res) {
   // * error, en caso de que algo haya ido mal
   admin.save(function(error) {
     if (error) {
-      // En caso de que se haya producido algún error, la petición termina con un código HTTP 500 (SERVER ERROR) y enviando como respuesta 
+      // En caso de que se haya producido algún error, la petición termina con un código HTTP 500 (SERVER ERROR) y enviando como respuesta
       // un objeto indicando que la petición ha sido errónea
       res.status(500).json({ success: false, message: 'Error al crear administrador' });
     } else {
@@ -174,7 +174,7 @@ app.get('/check', function(req, res) {
   // y lo almacenamos en una variable con el mismo nombre
   var token = req.query.token;
   if (!token) {
-    // En caso de que token no exista, o sea vacío, enviamos una respuesta HTTP 401 (UNAUTHORIZED) indicando el error 
+    // En caso de que token no exista, o sea vacío, enviamos una respuesta HTTP 401 (UNAUTHORIZED) indicando el error
     res.status(401).send({
       success: false,
       message: 'No hay token',
@@ -225,7 +225,7 @@ secureRouter.use(function(req, res, next) {
   // Intentamos obtener el token de las cabeceras de la petición accediendo al campo 'headers' del parámetro de entrada 'req'
   var token = req.headers['token-seguro'];
   if (!token) {
-    // En caso de que no exista, la petición no puede ser validada, por tanto devolvemos una respuesta HTTP con código 401 (UNAUTHORIZED) 
+    // En caso de que no exista, la petición no puede ser validada, por tanto devolvemos una respuesta HTTP con código 401 (UNAUTHORIZED)
     // con un objeto indicando el problema
     res.status(401).send({
       success: false,
@@ -260,7 +260,7 @@ secureRouter.use(function(req, res, next) {
  */
 secureRouter.route('/users').get(function(req, res) {
   /**
-   * Utilizando el modelo generado por 'mongoose' para la tabla 'users' en el archivo 'user.js' hacemos una consulta a MongoDB usando 
+   * Utilizando el modelo generado por 'mongoose' para la tabla 'users' en el archivo 'user.js' hacemos una consulta a MongoDB usando
    * la función find, que recibe como parámetros:
    * + El filtro que se va a ejecutar, en este caso no hay ningún filtro, por lo que se pone un objeto vacío {}
    * + La función que se ejecutará cuando la consulta finalice, que a su vez recibe dos parámetros:
@@ -318,7 +318,7 @@ secureRouter.route('/users').post(function(req, res) {
  */
 secureRouter.route('/users/:id').delete(function(req, res) {
   /**
-   * Utilizando el modelo generado por 'mongoose' para la tabla 'users' en el archivo 'user.js' hacemos una consulta a MongoDB usando 
+   * Utilizando el modelo generado por 'mongoose' para la tabla 'users' en el archivo 'user.js' hacemos una consulta a MongoDB usando
    * la función remove, que recibe como parámetros:
    * + El filtro que se va a ejecutar, buscamos eliminar un usuario dado su _id de MongoDB, que lo enviamos en la petición.
    *    La librería 'express' parseará la petición /users/:id y detectará que :id es un parámetro, así que si por ejemplo ejecutamos la
@@ -329,7 +329,7 @@ secureRouter.route('/users/:id').delete(function(req, res) {
    */
   User.remove({ _id: req.params.id }, function(error) {
     if (error) {
-      // Si se ha producido algún tipo de error se envía una petición de respuesta HTTP 500 (INTERNAL SERVER ERROR) indicando el problema      
+      // Si se ha producido algún tipo de error se envía una petición de respuesta HTTP 500 (INTERNAL SERVER ERROR) indicando el problema
       res.status(500).json({ success: false, message: 'Error al borrar usuario' });
     } else {
       // En caso contrario, enviamos una respuesta HTTP 200 (OK) indicando que el usuario ha sido borrado
@@ -359,7 +359,7 @@ secureRouter.route('/users/:id').put(function(req, res) {
    */
   User.findById(req.params.id, function(error, user) {
     if (error) {
-      // Si se ha producido algún tipo de error se envía una petición de respuesta HTTP 500 (INTERNAL SERVER ERROR) indicando el problema            
+      // Si se ha producido algún tipo de error se envía una petición de respuesta HTTP 500 (INTERNAL SERVER ERROR) indicando el problema
       res.status(500).json({ success: false, message: 'Error al actualizar usuario' });
     } else {
       // En caso contrario, comprobamos si existe el usuario comprobando la variable 'user'
@@ -367,7 +367,7 @@ secureRouter.route('/users/:id').put(function(req, res) {
         // Si el usuario no existe, enviamos una respuesta HTTP 404 (NOT FOUND) indicando el problema
         res.status(404).json({ success: false, message: 'Usuario no encontrado' });
       } else {
-        // Si existe, obtenemos del cuerpo de la petición PUT los atributos que van a ser modificados que hemos podido extraer y parsear gracias a la librería 'bodyparser', 
+        // Si existe, obtenemos del cuerpo de la petición PUT los atributos que van a ser modificados que hemos podido extraer y parsear gracias a la librería 'bodyparser',
         // comprobando uno a uno si existen. En caso de que un atributo a modificar exista, se sustituirá el contenido en el 'user' encontrado por el que venga en la petición.
         if (req.body.name) {
           user.name = req.body.name;
@@ -384,13 +384,13 @@ secureRouter.route('/users/:id').put(function(req, res) {
         if (req.body.department) {
           user.department = req.body.department;
         }
-          // Por último utilizando el modelo generado por 'mongoose' para la tabla 'users' en el archivo 'user.js' hacemos una consulta a MongoDB usando 
-          // la función save, que recibe como parámetros:
-          // * La función que se ejecutará cuando la consulta finalice, que a su vez recibe parámetros:
-          //    - Un error si es que se produjo alguno, en caso contrario 'null'
+        // Por último utilizando el modelo generado por 'mongoose' para la tabla 'users' en el archivo 'user.js' hacemos una consulta a MongoDB usando
+        // la función save, que recibe como parámetros:
+        // * La función que se ejecutará cuando la consulta finalice, que a su vez recibe parámetros:
+        //    - Un error si es que se produjo alguno, en caso contrario 'null'
         user.save(function(error) {
           if (error) {
-            // Si se ha producido algún tipo de error se envía una petición de respuesta HTTP 500 (INTERNAL SERVER ERROR) indicando el problema            
+            // Si se ha producido algún tipo de error se envía una petición de respuesta HTTP 500 (INTERNAL SERVER ERROR) indicando el problema
             res.status(500).json({ success: false, message: 'Error al actualizar usuario' });
           } else {
             // En caso contrario, se envía una petición HTTP 200 (OK) indicando que todo ha funcionado correctamente
@@ -421,8 +421,8 @@ app.use('/secure', secureRouter);
  *    }
  * }
  * y entonces, en nuestra aplicación principal 'express' tendremos las siguientes rutas operativas
- * 
- * Tipo     Ruta                Segura    Params  Url_Params    Body_Params 
+ *
+ * Tipo     Ruta                Segura    Params  Url_Params    Body_Params
  * ------------------------------------------------------------------------------------------------
  * GET      /setup              -         -       -             -
  * GET      /check              -         token   -             -
@@ -433,7 +433,7 @@ app.use('/secure', secureRouter);
  * DELETE   /secure/users/:id   *         -       id            -
  */
 
-// Para terminar de configurar el servicio, le indicamos un puerto al que debe escuchar para recibir las peticiones, 
+// Para terminar de configurar el servicio, le indicamos un puerto al que debe escuchar para recibir las peticiones,
 // en este caso el 3000, y que cuando arranca correctamente, ejecuta una función con un mensaje que lo indica.
 app.listen(3000, function() {
   console.log('Example app listening on port 3000!');
