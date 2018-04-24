@@ -9,7 +9,7 @@ var bcrypt = require('bcrypt-nodejs');
 var Schema = mongoose.Schema;
 
 // Definición del esquema de la tabla 'admins' de MongoDB.
-// Incluye: 
+// Incluye:
 // * nombre(name). Campo único. String
 // * contraseña(password). String
 // La tabla administradores representan los usuarios que pueden acceder a la aplicación y administrar usuarios.
@@ -39,12 +39,12 @@ AdminSchema.pre('save', function(next) {
 
   // Usando la librería 'bcrypt-nodejs' ciframos generamos un salt con una función que recibe como parámetros:
   // * El número de ciclos de generación de salt
-  // * Una función que se ejecutará cuando termine de generarse el salt, y que recibe como parámetros: 
+  // * Una función que se ejecutará cuando termine de generarse el salt, y que recibe como parámetros:
   //    - Un error (si se produjo alguno, si no será null)
   //    - El salt generado
   bcrypt.genSalt(10, function(error, salt) {
     if (error) {
-      // Si se ha producido algún error, lo lanzamos como excepción para evitar que se almacene el usuario en base de datos      
+      // Si se ha producido algún error, lo lanzamos como excepción para evitar que se almacene el usuario en base de datos
       throw error;
     }
     // Si el salt se ha generado correctamente, lo utilizamos para cifrar la contraseña en plano del administrador.
@@ -69,11 +69,11 @@ AdminSchema.pre('save', function(next) {
   });
 });
 
-// 
+//
 /**
  * Añadimos un método o función personalizado a la lista de métodos del modelo creado. Este método se encargará, cuando se inicie un proceso de login
  * de comprobar que la contraseña en plano coincide con la contraseña cifrada almacenada en base de datos
- * 
+ *
  * @param {String} password La contraseña en plano a comparar
  * @param {function} next la función que se ejecutará cuando termine el proceso de comprobación, ya sea con o sin éxito
  */
@@ -91,8 +91,8 @@ AdminSchema.methods.checkPassword = function(password, next) {
   //    - El resultado booleano de la comparación
   bcrypt.compare(password, admin.password, function(error, result) {
     if (error) {
-        // Si se ha producido algún error, lo lanzamos como excepción para parar el proceso
-        throw error;
+      // Si se ha producido algún error, lo lanzamos como excepción para parar el proceso
+      throw error;
     }
     if (result) {
       // Si la comparación es exitosa, ejecutamos la función de retorno o callback para que continue el proceso de ejecución
