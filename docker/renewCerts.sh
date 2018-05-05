@@ -1,11 +1,9 @@
 #!/bin/sh
 
-docker-machine regenerate-certs managerA1 -f
-docker-machine regenerate-certs managerA2 -f
-docker-machine regenerate-certs workerA1 -f
-docker-machine regenerate-certs workerA2 -f
+machines=( "managerA1" "managerA2" "workerA1" "workerA2" "managerB1" "managerB2" "workerB1" "workerB2" )
 
-docker-machine regenerate-certs managerB1 -f
-docker-machine regenerate-certs managerB2 -f
-docker-machine regenerate-certs workerB1 -f
-docker-machine regenerate-certs workerB2 -f
+for machine in "${machines[@]}"
+do
+  docker-machine start $machine
+  docker-machine regenerate-certs $machine -f
+done
